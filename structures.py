@@ -5,7 +5,7 @@ class Meter:
 
 
 class Problem:
-    def __init__(self):
+    def __init__(self, time, session):
         self.problemName = None
         self.color = None
 
