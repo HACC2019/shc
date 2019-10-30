@@ -1,0 +1,3 @@
+def makeTimeStamps():
+    maxTime =
+    minTime =
