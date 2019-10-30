@@ -18,8 +18,6 @@ def sql_fetch_EndTimes(con):
 
 print(sql_fetch_StartTimes(con))
 
-StartTime_List = sql_fetch_StartTimes(con)
-
 def convertUNIX():
     now = datetime.now()
     timestamp = datetime.timestamp(now)
