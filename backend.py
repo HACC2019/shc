@@ -1,8 +1,5 @@
 import sqlite3
 
-def makeTimeStamps():
-    maxTime =
-    minTime =
 
 def add_column(db, table, column, data):
     """Set a column equal to a list, creating the column if it doesn't exist"""
@@ -16,4 +13,3 @@ def add_column(db, table, column, data):
         raise TypeError("Expected string, got {}".format(type(column)))
     if type(data) is not list:
         raise TypeError("Expected list, got {}".format(type(data)))
-
