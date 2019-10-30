@@ -7,16 +7,21 @@ cursorObj = con.cursor()
 def sql_fetch_StartTimes(con):
     cursorObj.execute('SELECT "Start Time" FROM raw')
     StartTime = cursorObj.fetchall()
+    StartList=[]
     for row in StartTime:
-        print(row)
+        StartList+=row
 
 def sql_fetch_EndTimes(con):
     cursorObj.execute('SELECT "End Time" FROM raw')
     EndTime = cursorObj.fetchall()
+    EndList=[]
     for row in EndTime:
-        print(row)
+        EndList+=row
 
-print(sql_fetch_StartTimes(con))
+
+print(sql_fetch_EndTimes(con))
+
+#StartTime_List = sql_fetch_StartTimes(con)
 
 def convertUNIX():
     now = datetime.now()
