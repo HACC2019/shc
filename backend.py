@@ -24,9 +24,15 @@ def add_column(db, table, column, data, dtype="TEXT"):
     except MySQLdb._exceptions.OperationalError:
         pass
 
+    # Find max row num to know when to stop updating and start inserting
+    maxindex = con.query("SELECT MAX(ID) FROM {}".format(table))
+
     # Create column and add in data #
     con.query("ALTER TABLE {} ADD {} {}".format(table, column, dtype))
     i = 1
     for value in data:  # Replace every row with data starting at ID 1
-        con.query("UPDATE {} SET {}={} WHERE ID={}".format(table, column, "'" + value + "'", i))
+        if i <= maxindex
+            con.query("UPDATE {} SET {}='{}' WHERE ID={}".format(table, column, value, i))
+        if i > maxindex:
+            con.query("INSERT INTO {} ({}) VALUES ('{}')".format(table, column, value))
         i += 1
