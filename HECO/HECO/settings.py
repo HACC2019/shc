@@ -77,7 +77,11 @@ WSGI_APPLICATION = 'HECO.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.path.join(BASE_DIR, 'HACC_HECO_mysql_Database.cnf'),
+        'NAME': 'hacc',
+        'USER': 'hacc',
+        'PASSWORD': 'hacc2019',
+        'HOST': 'pf.parsl.dev',
+        'PORT': '3306',
     }
 }
 
