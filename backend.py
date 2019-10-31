@@ -26,12 +26,7 @@ def add_column(db, table, column, data, dtype="TEXT"):
 
     # Create column and add in data #
     con.query("ALTER TABLE {} ADD {} {}".format(table, column, dtype))
-    datastring = ""
-    for value in data:  # Reformat to be of format [(value), (value2)]
-        datastring += "('{}'),".format(value)
-    datastring = datastring[:-1]  # Remove trailing comma
-    print("INSERT INTO {} ({}) VALUES {}".format(table, column, datastring))
-    con.query("INSERT INTO {} ({}) VALUES {};".format(table, column, datastring))
-
-
-add_column(con, "proc", "dhjskadhsakj", ["hi", "hi2"])
+    i = 1
+    for value in data:  # Replace every row with data starting at ID 1
+        con.query("UPDATE {} SET {}={} WHERE ID={}".format(table, column, "'" + value + "'", i))
+        i += 1
