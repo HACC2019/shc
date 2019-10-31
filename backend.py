@@ -1,8 +1,8 @@
 from UnixConverter import unix_Converter
 unix_Converter()
-import sqlite3
+import MySQLdb
 
-con = sqlite3.connect('shc.db')
+con = MySQLdb.connect(host="pf.parsl.dev", user="hacc", passwd="hacc2019")
 cursorObj = con.cursor()
 def makeTimeStamps():
     max_time = cursorObj.execute("SELECT MAX([End Time]) FROM raw")
