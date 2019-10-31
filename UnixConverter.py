@@ -42,12 +42,12 @@ def unix_Converter():
             utc = datetime.strptime(date, "('%m-%d-%y %H:%M:%S',)")
             #print(int(utc.timestamp()) - 36000)
             utcint = int(utc.timestamp()) - 36000
-            print (utcint)
+            #print (utcint)
         except ValueError:
             utc = datetime.strptime(date, "('%m/%d/%Y %H:%M:%S',)")
             #print(int(utc.timestamp()) - 36000)
             utcint = int(utc.timestamp()) - 36000
-            print (utcint)
+            #print (utcint)
         StartListInt.append(utcint)
 
     for date in EndList:
@@ -55,15 +55,17 @@ def unix_Converter():
             utc = datetime.strptime(date, "('%m-%d-%y %H:%M:%S',)")
             #print(int(utc.timestamp()) - 36000)
             utcint = int(utc.timestamp()) - 36000
-            print (utcint)
+            #print (utcint)
         except ValueError:
             utc = datetime.strptime(date,"('%m/%d/%Y %H:%M:%S',)")
             #print(int(utc.timestamp()) - 36000)
             utcint = int(utc.timestamp()) - 36000
-            print (utcint)
+            #print (utcint)
         EndListInt.append(utcint)
+    return(StartListInt)
+    return(EndListInt)
 """(inputtime - starttime)/Unixdays"""
-def FindDayIntervals():
+'''def FindDayIntervals():
     maxTime = backend.findMaxTime(con)
     minTime = backend.findMinTime(con)
     UnixDayValue=86400
@@ -74,8 +76,8 @@ def FindDayIntervals():
         TimeIndexes.append(x)
     TimeIndexes.append(maxTime)
     print(TimeIndexes)
-
+'''
 unix_Converter()
 print(StartListInt)
 print(EndListInt)
-FindDayIntervals()
+
