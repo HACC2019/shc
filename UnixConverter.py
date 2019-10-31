@@ -62,9 +62,6 @@ def unix_Converter():
             utcint = int(utc.timestamp()) - 36000
             print (utcint)
         EndListInt.append(utcint)
-
-
-
 """(inputtime - starttime)/Unixdays"""
 def FindDayIntervals():
     maxTime = backend.findMaxTime(con)
