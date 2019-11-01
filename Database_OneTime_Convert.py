@@ -7,5 +7,5 @@ con = MySQLdb.connect(host="pf.parsl.dev", user="hacc", passwd="hacc2019", db='h
 cursorObj = con.cursor()
 
 UnixConverter.unix_Converter()
-backend.add_column(db='hacc',table='raw',column='Start_Time',data=UnixConverter.StartListInt)
-backend.add_column(db='hacc',table='raw',column='End_Time',data=UnixConverter.EndListInt)
+backend.add_column(db=con,table='raw',column='Start_Time',data=UnixConverter.StartListInt)
+backend.add_column(db=con,table='raw',column='End_Time',data=UnixConverter.EndListInt)
