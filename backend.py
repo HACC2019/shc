@@ -5,8 +5,8 @@ def add_column(db, table, column, data, dtype="TEXT"):
     """Set a column equal to a list, creating the column if it doesn't exist"""
 
     # Sanity checks #
-    if type(db) is not MySQLdb.dbnections.dbnection:
-        raise TypeError("Expected MySQLdb.dbnections.dbnection, got {}".format(type(db)))
+    if type(db) is not MySQLdb.connections.dbnection:
+        raise TypeError("Expected MySQLdb.connections.connection, got {}".format(type(db)))
     if type(table) is not str:
         raise TypeError("Expected string, got {}".format(type(table)))
     if type(column) is not str:
