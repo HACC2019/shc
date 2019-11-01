@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 MySQLdb
+=======
+mysqlclient==1.4.4
+>>>>>>> origin/shane
 numpy==1.17.3
 pandas==0.25.2
 python-dateutil==2.8.0
