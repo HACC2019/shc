@@ -22,19 +22,17 @@ def add_column(db, table, column, data, dtype="TEXT"):
     except MySQLdb._exceptions.OperationalError:
         pass
 
-    # Find max row num to know when to stop updating and start inserting
+    # Find max row num to know when to stop updating and start inserting #
     cur = db.cursor()
     cur.execute("SELECT MAX(ID) FROM {}".format(table))
     maxindex = cur.fetchall()
-    print(maxindex[0][0])
 
     # Create column and add in data #
     db.query("ALTER TABLE {} ADD {} {}".format(table, column, dtype))
     i = 1
     for value in data:  # Replace every row with data starting at ID 1
-        if i <= maxindex[0][0]:
+        if i <= maxindex[0][0]:  # Update if row exists
             db.query("UPDATE {} SET {}='{}' WHERE ID={}".format(table, column, value, i))
-        if i > maxindex[0][0]:
+        if i > maxindex[0][0]:  # Insert if row doesn't exist
             db.query("INSERT INTO {} ({}) VALUES ('{}')".format(table, column, value))
         i += 1
-
