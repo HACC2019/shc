@@ -16,3 +16,4 @@ class Raw_Data(models.Model):
 
     def __str__(self):
         return self.Charge_Station_Name
+
