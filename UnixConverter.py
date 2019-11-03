@@ -1,24 +1,20 @@
 from datetime import datetime
-global StartList
-global EndList
-global StartListInt
-global EndListInt
 import MySQLdb
 
-con = MySQLdb.connect(host="pf.parsl.dev", user="hacc", passwd="hacc2019", db='hacc')
+#con = MySQLdb.connect(host="pf.parsl.dev", user="hacc", passwd="hacc2019", db='hacc')
 #con = sqlite3.connect('shc.db')
 cursorObj = con.cursor()
 
 def sql_fetch_StartTimes(con):
-    global StartList
     con.query('SELECT Start_Time FROM raw')
     StartTimeResult=con.store_result()
     StartTime=StartTimeResult.fetch_row(maxrows=0)
     StartList=[]
     for row in StartTime:
         StartList.append(str(row))
+    return StartList
+
 def sql_fetch_EndTimes(con):
-    global EndList
     #EndTime = cursorObj.execute('SELECT End_Time FROM raw')
     con.query('SELECT End_Time FROM raw')
     EndTimeResult = con.store_result()
@@ -26,15 +22,12 @@ def sql_fetch_EndTimes(con):
     EndList=[]
     for row in EndTime:
         EndList.append(str(row))
+    return EndList
 
-sql_fetch_StartTimes(con)
-sql_fetch_EndTimes(con)
 
-def unix_Converter():
-    global StartListInt
-    global EndListInt
+def unix_ConvertStart(con):
     StartListInt=[]
-    EndListInt=[]
+    StartList=sql_fetch_StartTimes(con)
     for date in StartList:
         try:
             utc = datetime.strptime(date, "('%m-%d-%y %H:%M:%S',)")
@@ -47,7 +40,11 @@ def unix_Converter():
             utcint = int(utc.timestamp()) - 36000
             #print (utcint)
         StartListInt.append(utcint)
+    return StartListInt
 
+def unix_ConvertEnd(con):
+    EndListInt = []
+    EndList=sql_fetch_EndTimes(con)
     for date in EndList:
         try:
             utc = datetime.strptime(date, "('%m-%d-%y %H:%M:%S',)")
@@ -60,7 +57,7 @@ def unix_Converter():
             utcint = int(utc.timestamp()) - 36000
             #print (utcint)
         EndListInt.append(utcint)
+    return EndListInt
 
-unix_Converter()
-print(StartListInt)
-print(EndListInt)
+print(unix_ConvertStart())
+print(unix_ConvertEnd())

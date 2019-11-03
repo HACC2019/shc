@@ -1,4 +1,5 @@
 #from UnixConverter import unix_Converter
+from datetime import datetime
 #unix_Converter()
 import MySQLdb
 #import sqlite3
@@ -51,3 +52,57 @@ def add_column(db, table, column, data, dtype="TEXT"):
     for value in data:  # Replace every row with data starting at ID 1
         con.query("UPDATE {} SET {}={} WHERE ID={}".format(table, column, "'" + value + "'", i))
         i += 1
+#Unix Converter and stuff
+def sql_fetch_StartTimes(con):
+    con.query('SELECT Start_Time FROM raw')
+    StartTimeResult=con.store_result()
+    StartTime=StartTimeResult.fetch_row(maxrows=0)
+    StartList=[]
+    for row in StartTime:
+        StartList.append(str(row))
+    return StartList
+
+def sql_fetch_EndTimes(con):
+    #EndTime = cursorObj.execute('SELECT End_Time FROM raw')
+    con.query('SELECT End_Time FROM raw')
+    EndTimeResult = con.store_result()
+    EndTime=EndTimeResult.fetch_row(maxrows=0)
+    EndList=[]
+    for row in EndTime:
+        EndList.append(str(row))
+    return EndList
+
+
+def unix_ConvertStart(con):
+    StartListInt=[]
+    StartList=sql_fetch_StartTimes(con)
+    for date in StartList:
+        try:
+            utc = datetime.strptime(date, "('%m-%d-%y %H:%M:%S',)")
+            #print(int(utc.timestamp()) - 36000)
+            utcint = int(utc.timestamp()) - 36000
+            #print (utcint)
+        except ValueError:
+            utc = datetime.strptime(date, "('%m/%d/%Y %H:%M:%S',)")
+            #print(int(utc.timestamp()) - 36000)
+            utcint = int(utc.timestamp()) - 36000
+            #print (utcint)
+        StartListInt.append(utcint)
+    return StartListInt
+
+def unix_ConvertEnd(con):
+    EndListInt = []
+    EndList=sql_fetch_EndTimes(con)
+    for date in EndList:
+        try:
+            utc = datetime.strptime(date, "('%m-%d-%y %H:%M:%S',)")
+            #print(int(utc.timestamp()) - 36000)
+            utcint = int(utc.timestamp()) - 36000
+            #print (utcint)
+        except ValueError:
+            utc = datetime.strptime(date,"('%m/%d/%Y %H:%M:%S',)")
+            #print(int(utc.timestamp()) - 36000)
+            utcint = int(utc.timestamp()) - 36000
+            #print (utcint)
+        EndListInt.append(utcint)
+    return EndListInt
