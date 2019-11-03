@@ -5,10 +5,18 @@ cursorObj = con.cursor()
 #given start + end time, find values between it, find avg
 #select avg kwh from raw where timestamp is less than or greater than __
 
-def sql_data_averages(starttime, endtime):
-    con.query('SELECT Start_Time FROM raw WHERE Start_Time BETWEEN starttime AND endtime ')
-    TotalTimeResult = con.store_result()
+def gatherRows(starttime, endtime):
+    con.query('SELECT Start_Time FROM raw WHERE Start_Time BETWEEN (%s!) AND (%s!)', (starttime, endtime))
+    rowDataResult = con.store_result()
+    rowData = rowDataResult.fetch_row(maxrows=0)
+    rowDataList = []
+    for i in rowDataResult:
+        rowDataList.append(str(i))
+    print(rowDataList)
+
+
+def averageData(column):
 
 
 
-
+gatherRows()

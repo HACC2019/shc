@@ -1,7 +1,7 @@
 from datetime import datetime
 import MySQLdb
 
-#con = MySQLdb.connect(host="pf.parsl.dev", user="hacc", passwd="hacc2019", db='hacc')
+con = MySQLdb.connect(host="pf.parsl.dev", user="hacc", passwd="hacc2019", db='hacc')
 #con = sqlite3.connect('shc.db')
 cursorObj = con.cursor()
 
@@ -59,5 +59,5 @@ def unix_ConvertEnd(con):
         EndListInt.append(utcint)
     return EndListInt
 
-print(unix_ConvertStart())
-print(unix_ConvertEnd())
+print(unix_ConvertStart(con))
+print(unix_ConvertEnd(con))
