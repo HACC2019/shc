@@ -16,6 +16,7 @@ def gatherRows(starttime, endtime):
     con.query(("SELECT * FROM raw WHERE Start_Time >= '%d' AND End_Time <= '%d", (1535768703, 1535878761)))
     rowData = con.store_result()
     rowDataResults = rowData.fetch_row(maxrows=0)
+    con.query('SELECT * FROM raw WHERE Start_Time BETWEEN (%s!) AND (%s!)'(starttime, endtime))
     rowDataList = []
     for i in rowDataResults:
         rowDataList.append(str(i))
@@ -23,7 +24,6 @@ def gatherRows(starttime, endtime):
 
 
 #def averageData(column):
-
 
 #starttime = bytes([1535768703]);
 #endtime = bytes([1535878761]);
@@ -41,5 +41,7 @@ gatherRows(starttime, endtime)
 '''print(sys.getsizeof(starttime))
 print(sys.getsizeof(endtime))
 
+<<<<<<< HEAD
 myint = 12
 print(sys.getsizeof(myint))'''
+
