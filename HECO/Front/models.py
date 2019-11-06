@@ -15,5 +15,13 @@ class Raw_Data(models.Model):
     Payment_Mode = models.CharField(max_length=800)
 
     def __str__(self):
-        return self.Charge_Station_Name
+        return (self.Charge_Station_Name, self.Session_Id)
+
+class procc(models.Model):
+    unix_time_stamp = models.CharField(max_length=800)
+    Charge_Station_Name = models.CharField(max_length=800)
+    Average_kwh = models.CharField(max_length=800)
+
+    def __str__(self):
+        return (self.unix_time_stamp, self.Charge_Station_Name)
 
