@@ -1,4 +1,13 @@
 import MySQLdb
+import structures
+
+
+global meters  # List of structures.Meter objects
+meters = []
+global meterdict  # Dictionary of charger name vs 'meters' index
+meterdict = {}
+
+con = MySQLdb.connect(db="hacc",host="pf.parsl.dev", user="hacc", passwd="hacc2019")
 
 
 def add_column(db, table, column, data, dtype="TEXT"):
@@ -36,3 +45,15 @@ def add_column(db, table, column, data, dtype="TEXT"):
         if i > maxindex[0][0]:  # Insert if row doesn't exist
             db.query("INSERT INTO {} ({}) VALUES ('{}')".format(table, column, value))
         i += 1
+
+
+def populate_meters(db):
+    db.query("SELECT DISTINCT Charge_Station_Name FROM raw;")
+    dbnames = db.store_result()
+    chargerindex = 0  # Index of charger name in 'meters'
+    for chargertup in dbnames.fetch_row(maxrows=0):
+        chargername = chargertup[0]
+        meterdict[chargername] = chargerindex
+        chargerindex += 1
+        meters.append(structures.Meter(chargername))
+
