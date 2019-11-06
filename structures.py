@@ -1,6 +1,7 @@
 class Meter:
-    def __init__(self):
+    def __init__(self, name):
         self.problems = []
+        self.name = name
         self.status = 0
 
 
