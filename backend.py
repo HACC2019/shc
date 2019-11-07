@@ -2,6 +2,15 @@
 from datetime import datetime
 #unix_Converter()
 import MySQLdb
+import structures
+
+
+global meters  # List of structures.Meter objects
+meters = []
+global meterdict  # Dictionary of charger name vs 'meters' index
+meterdict = {}
+
+con = MySQLdb.connect(db="hacc",host="pf.parsl.dev", user="hacc", passwd="hacc2019")
 
 con = MySQLdb.connect(db="hacc",host="pf.parsl.dev", user="hacc", passwd="hacc2019")
 #con = sqlite3.connect('shc.db')
@@ -190,8 +199,6 @@ def averageDataActually(column):
     print(totalAmount/totalValues)
 
 #Find TimeIntervals and add Timeintervals to proc table
-
-#Find Intervals
 def FindDayIntervals():
     maxTime = findMaxTime(con)
     minTime = findMinTime(con)
@@ -208,6 +215,16 @@ def FindDayIntervals():
     print(minTime)
     print(TimeIndexes)
     return(TimeIndexes)
+    add_column(db=con, table='proc', column='TimeInterval', data=FindDayIntervals())
 
-#Add TimeIntervals to proc table
-add_column(db=con,table='proc',column='TimeInterval',data=FindDayIntervals())
+
+def populate_meters(db):
+    db.query("SELECT DISTINCT Charge_Station_Name FROM raw;")
+    dbnames = db.store_result()
+    chargerindex = 0  # Index of charger name in 'meters'
+    for chargertup in dbnames.fetch_row(maxrows=0):
+        chargername = chargertup[0]
+        meterdict[chargername] = chargerindex
+        chargerindex += 1
+        meters.append(structures.Meter(chargername))
+
