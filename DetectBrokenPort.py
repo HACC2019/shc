@@ -1,29 +1,22 @@
 import backend
 import MySQLdb
 
-def usesPer(startTime, endTime, stationName):
-    rowDataList= backend.gatherRows(startTime, endTime, backend.con)
-    DCCuseInstances = 0
-    CHADuseInstances = 0
+def chargeTypeUsages(db, startTime, endTime, stationName):
+    rowDataList = backend.gatherRows(startTime, endTime, db)
+
     DCCData = 0
-    CHADData=0
-    listList=[]
-    x=0
-    for i in rowDataList:
-        if rowDataList[x][0]==stationName:
-            listList.append(rowDataList[x][6])
-        x+=1
-    for i in listList:
-        if i == 'CHADEMO':
-            CHADData+=1
-        elif i == 'DCCOMBOTYP1':
-            DCCData+=1
-        else:
-            print("excuse me")
-    print(listList)
+    CHADData = 0
+    for row in rowDataList:
+        if row[0] == stationName:
+            if row[6] == 'CHADEMO':
+                CHADData += 1
+            elif row[6] == 'DCCOMBOTYP1':
+                DCCData += 1
+            else:
+                print("new charger type: {}".format(row[6]))
     print(CHADData)
     print(DCCData)
 
-startTime=1535981923
-endTime=1535989810
-usesPer(startTime, endTime, "A")
+startTime = backend.findMinTime(backend.con)[0][0]
+endTime = backend.findMaxTime(backend.con)[0][0]
+chargeTypeUsages(backend.con, startTime, endTime, "B")
