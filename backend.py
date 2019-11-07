@@ -135,7 +135,7 @@ def gatherRows(starttime, endtime, con):
     return rowDataList
 
 
-def averageData(column):
+def averageData(starttime, endtime, column):
     rowDataList = gatherRows(starttime, endtime, con)
     columndata = []
     numba=0
@@ -146,7 +146,7 @@ def averageData(column):
     return columndata
 
 
-def averageDataActually(column):
+def averageDataActually(starttime, endtime, column):
     listOfValues=averageData(column)
     totalAmount=0
     totalValues=0
