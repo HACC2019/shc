@@ -18,9 +18,14 @@ def FindDayIntervals():
         x=minTime+i*UnixDayValue
         TimeIndexes.append(x)
     TimeIndexes.append(maxTime)
+    print(maxTime)
+    print(minTime)
+    print(TimeIndexes)
     return(TimeIndexes)
 
+backend.add_column(db=backend.con,table='proc',column='TimeInterval',data=FindDayIntervals())
 
-
-FindDayIntervals()
+#FindDayIntervals()
 backend.con.close()
+
+
