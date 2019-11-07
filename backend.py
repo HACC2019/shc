@@ -2,6 +2,7 @@
 from datetime import datetime
 #unix_Converter()
 import MySQLdb
+from statistics import mean
 import structures
 
 
@@ -200,3 +201,27 @@ def chargeTypeUsages(db, startTime, endTime, stationName):
                 DCCData += 1
             else:
                 print("new charger type: {}".format(row[6]))
+
+
+def detect_congestion(db, start_time, end_time):
+    """Search for congestion **between** start_time and end_time
+    Returns True if avg time between usages is less than CONGESTION_THRESH"""
+    CONGESTION_THRESH = 60
+    return_dict = {}
+
+    for meter in meters:
+        time_between_charges = []
+        previous_previous_time = start_time  # When I made this variable, I realized all was lost.
+        current_time = start_time
+        while int(current_time) < end_time:
+            db.query("SELECT MIN(End_Time) FROM raw WHERE Charge_Station_Name='{}' AND End_Time>'{}'".format(meter.name, previous_previous_time))
+            previous_time = db.store_result().fetch_row()[0][0]
+            db.query("SELECT MIN(Start_Time) FROM raw WHERE Charge_Station_Name='{}' AND Start_Time>'{}'".format(meter.name, previous_time))
+            current_time = db.store_result().fetch_row()[0][0]
+            previous_previous_time = previous_time
+            time_between_charges.append(int(current_time) - int(previous_time))
+        if mean(time_between_charges) <= CONGESTION_THRESH:
+            return_dict[meter.name] = True
+        else:
+            return_dict[meter.name] = False
+    return return_dict
