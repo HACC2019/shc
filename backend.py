@@ -193,9 +193,9 @@ def averageDataActually(starttime, endtime, column):
 
 
 #Find TimeIntervals and add Timeintervals to proc table
-def FindDayIntervals():
-    maxTime = findMaxTime(con)
-    minTime = findMinTime(con)
+def FindDayIntervals(db):
+    maxTime = findMaxTime(db)
+    minTime = findMinTime(db)
     maxTime=int(maxTime[0][0])
     minTime=int(minTime[0][0])
     UnixDayValue=86400
@@ -209,7 +209,7 @@ def FindDayIntervals():
     print(minTime)
     print(TimeIndexes)
     return(TimeIndexes)
-    add_column(db=con, table='proc', column='TimeInterval', data=FindDayIntervals())
+    # add_column(db=con, table='proc', column='TimeInterval', data=FindDayIntervals())
 
 
 def populate_meters(db):
@@ -223,26 +223,37 @@ def populate_meters(db):
         meters.append(structures.Meter(chargername))
 
 
-def detect_congestion(db, start_time, end_time):
+def detect_congestion(db, start_time, end_time, metername):
     """Search for congestion **between** start_time and end_time
     Returns True if avg time between usages is less than CONGESTION_THRESH"""
     CONGESTION_THRESH = 60
     return_dict = {}
 
-    for meter in meters:
-        time_between_charges = []
-        previous_previous_time = start_time  # When I made this variable, I realized all was lost.
-        current_time = start_time
-        while int(current_time) < end_time:
-            db.query("SELECT MIN(End_Time) FROM raw WHERE Charge_Station_Name='{}' AND End_Time>'{}'".format(meter.name, previous_previous_time))
-            previous_time = db.store_result().fetch_row()[0][0]
-            db.query("SELECT MIN(Start_Time) FROM raw WHERE Charge_Station_Name='{}' AND Start_Time>'{}'".format(meter.name, previous_time))
-            current_time = db.store_result().fetch_row()[0][0]
-            previous_previous_time = previous_time
-            time_between_charges.append(int(current_time) - int(previous_time))
-        if mean(time_between_charges) <= CONGESTION_THRESH:
-            return_dict[meter.name] = True
-        else:
-            return_dict[meter.name] = False
-    return return_dict
+    time_between_charges = []
+    previous_previous_time = start_time  # When I made this variable, I realized all was lost.
+    current_time = start_time
+    while int(current_time) < end_time:
+        db.query("SELECT MIN(End_Time) FROM raw WHERE Charge_Station_Name='{}' AND End_Time>'{}'".format(metername, previous_previous_time))
+        previous_time = db.store_result().fetch_row()[0][0]
+        db.query("SELECT MIN(Start_Time) FROM raw WHERE Charge_Station_Name='{}' AND Start_Time>'{}'".format(metername, previous_time))
+        current_time = db.store_result().fetch_row()[0][0]
+        previous_previous_time = previous_time
+        time_between_charges.append(int(current_time) - int(previous_time))
+    if mean(time_between_charges) <= CONGESTION_THRESH:
+        return True
+    else:
+        return False
 
+
+# BEGIN MAIN PROBLEM DETECTION #
+
+populate_meters(con)
+
+for meter in meters:
+    days = FindDayIntervals(con)
+    i = 0
+    for day in days:
+        startofday = days[i]
+        endofday = days[i+1]
+        if detect_congestion(con, startofday, endofday, meter.name):
+            meter.problems.append(structures.ProblemCongestion(startofday, endofday))
