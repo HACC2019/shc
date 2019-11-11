@@ -8,6 +8,7 @@
 	  <link rel="icon" type="image/png" href="../static/images/favicon.png">
     <!-- Bootstrap -->
     <link href="../static/css/bootstrap-4.3.1.css" rel="stylesheet">
+	  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id = "nav"><a class="navbar-brand" href="#">EMME for HECO</a>
@@ -47,9 +48,9 @@
 				  <div class="row">
 					<div class="col-sm-6">
 					  <div class="card">
-						  {% for name in station %}
-						  <h5 class = "card-img-top">{{ name }}</h5>
-						  {% endfor %}
+						 
+						  <canvas class="card-img-top"></canvas>
+						  
 						<div class="card-body">
 						  <h5 class="card-title">Notifications</h5>
 						  <p class="card-text">Real-time</p>
@@ -58,7 +59,7 @@
 					</div>
 					<div class="col-sm-6">
 					  <div class="card">
-						<img class="card-img-top" src="../static/images/600X300.gif" alt="Card image cap">
+						<canvas id = "mychart" class="card-img-top"></canvas>
 						<div class="card-body">
 						  <h5 class="card-title">Power Graph</h5>
 						  <p class="card-text"> Real-time</p>
@@ -103,6 +104,43 @@ E-M: something@something.com
         </div>
       </div>
     </footer>
+	  <script>
+		  let mychart = document.getElementById('mychart').getContext('2d');
+		  
+		  var tick = 0;
+		  var color = ["rgb(252, 3, 3)", "rgb(4, 138, 6)", "rgb(11, 224, 210)", "rgb(221, 11, 224)"]
+		  
+		  
+		  let linechart = new Chart(mychart,  {"type":"line",
+											   "data":{
+												   "labels":[{% for n in time %}
+															 {% if n.Start_Time > mintime %}
+															 "{{ n.Start_Time }}",
+															 {% endif %}
+															 {% endfor %}],
+												   "datasets":
+												   [{% for name in station %}
+													   {"label":"{{ name }}",
+													 "data":[
+													{% for n in data %}
+														{% for i in n %}
+															{% if i.Charge_Station_Name == name %}
+																{% if i.Start_Time > mintime %}
+																	{{ i.Energy }},
+																{% endif %}
+															{% endif %}
+														{% endfor %}
+													{% endfor %}
+												   ],
+													 "fill":false,
+													 "borderColor":color[tick++],
+												   
+													 "lineTension":0.1},
+													{% endfor %}
+												   ]},
+											   "options":{}}
+		  )
+	  </script>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="../static/js/jquery-3.3.1.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
