@@ -6,8 +6,8 @@ class Meter:
 
 
 class Problem:
-    def __init__(self, starttime, endtime):
-        self.problemName = None
-        self.color = None
+    def __init__(self, starttime, endtime, name, color):
+        self.problemName = name
+        self.color = color
         self.problemStart = starttime
         self.problemEnd = endtime
