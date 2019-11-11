@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import Raw_Data
+from .backend import find_problems
 
 
 # Create your views here.
@@ -7,7 +8,7 @@ def Home(request):
     name = ['i']
     datas = []
 
-
+    find_problems()
 
 
     charge_station = Raw_Data.objects.all()
