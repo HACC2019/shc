@@ -328,6 +328,3 @@ def find_problems():
 
         except IndexError:
             print("reached end of table")
-
-
-find_problems()
