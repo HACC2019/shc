@@ -226,6 +226,47 @@ def detect_congestion(db, start_time, end_time, metername):
         return False
 
 
+def findCongestionPercentage(db, start_time, end_time, metername):
+    """Search for congestion **between** start_time and end_time
+    Returns True if avg time between usages is less than CONGESTION_THRESH"""
+    CONGESTION_THRESH = 60
+
+    time_between_charges = []
+    previous_previous_time = start_time  # When I made this variable, I realized all was lost.
+    current_time = start_time
+    while int(current_time) < end_time:
+        db.query("SELECT MIN(End_Time) FROM Front_raw_data WHERE Charge_Station_Name='{}' AND End_Time>'{}'".format(metername, previous_previous_time))
+        previous_time = db.store_result().fetch_row()[0][0]
+        db.query("SELECT MIN(Start_Time) FROM Front_raw_data WHERE Charge_Station_Name='{}' AND Start_Time>'{}'".format(metername, previous_time))
+        current_time = db.store_result().fetch_row()[0][0]
+        previous_previous_time = previous_time
+        time_between_charges.append(int(current_time) - int(previous_time))
+    CongestionInstances=0
+    for i in time_between_charges:
+        if i <= CONGESTION_THRESH:
+            CongestionInstances+=1
+    print(str(round(100*CongestionInstances/(len(time_between_charges)+1), 2))+"% Congestion")
+    congestionPercent = (round(100*CongestionInstances/(len(time_between_charges)+1), 2))
+    return congestionPercent
+
+
+def findDailyPercentage(db, starttime, metername):
+    daysOfTheWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    i = 0
+    percentages = []
+    for day in daysOfTheWeek:
+        dayofweek = starttime+(i)*86400
+        endofday = dayofweek+86400
+        #findCongestionPercentage(db, dayofweek, endofday, metername)
+        percentages.append(float(findCongestionPercentage(db, dayofweek, endofday, metername)))
+        i+=1
+    highestPercentage = (max(percentages))
+    highestPercentageIndex = int((percentages.index(highestPercentage)))
+    congestionPrediction = ("Within this week, " + str(daysOfTheWeek[highestPercentageIndex]) + " had the highest predicted congestion at " + str(highestPercentage) + "%")
+    return congestionPrediction
+print(findDailyPercentage(con, 1536284288, "A"))
+
+
 def chargeCHADUsages(db, startTime, endTime, stationName):
     rowDataList = gatherRows(startTime, endTime, db)
     CHADData = 0
