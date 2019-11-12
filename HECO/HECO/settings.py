@@ -25,7 +25,7 @@ SECRET_KEY = '6sq97(_o_0g(l6f^0&w)fz-ap0qr3s@fu67lto++wejpgs8lk%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['192.168.0.45']
 
 
 # Application definition
@@ -81,7 +81,7 @@ DATABASES = {
         'NAME': 'hacc',
         'USER': 'hacc',
         'PASSWORD': 'hacc2019',
-        'HOST': 'pf.parsl.dev',
+        'HOST': 'mysql.sock',
         'PORT': '3306',
     }
 }
