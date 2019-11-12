@@ -3,7 +3,10 @@ from datetime import datetime
 #unix_Converter()
 import MySQLdb
 from statistics import mean
-from .structures import Meter, Problem
+try:
+    from .structures import Meter, Problem
+except ModuleNotFoundError: # if running directly
+    from structures import Meter, Problem
 
 global meters  # List of structures.Meter objects
 meters = []
@@ -255,21 +258,21 @@ def chargeDCCUsages(db, startTime, endTime, stationName):
 
 
 def findUsageAverage(starttime, endtime, stationName):
-    CHADStatus=True
-    DCCStatus=True
+    CHADStatus=False
+    DCCStatus=False
     timeInterval=endtime-starttime
     if (chargeCHADUsages(con, starttime, endtime, stationName) == 0) and (chargeDCCUsages(con, starttime, endtime, stationName) == 0):
         #print("From " + str(starttime) + " to " + str(endtime) + " (" + str(round(timeInterval/86400.0, 3)) + " days), both chargers appear to be broken.")
-        CHADStatus = False
-        DCCStatus = False
+        CHADStatus = True
+        DCCStatus = True
     elif chargeCHADUsages(con, starttime, endtime, stationName) == 0:
         #print("From " + str(starttime) + " to " + str(endtime) + " (" + str(round(timeInterval/86400.0, 3)) + " days), the CHADEMO charger appears to be broken.")
-        CHADStatus = False
-        DCCStatus = True
-    elif chargeDCCUsages(con, starttime, endtime, stationName) == 0:
-        #print("From " + str(starttime) + " to " + str(endtime) + " (" + str(round(timeInterval/86400.0, 3)) + " days), the DCCOMBOTYP1 charger appears to be broken.")
         CHADStatus = True
         DCCStatus = False
+    elif chargeDCCUsages(con, starttime, endtime, stationName) == 0:
+        #print("From " + str(starttime) + " to " + str(endtime) + " (" + str(round(timeInterval/86400.0, 3)) + " days), the DCCOMBOTYP1 charger appears to be broken.")
+        CHADStatus = False
+        DCCStatus = True
     else:
         pass
         #print("From " + str(starttime) + " to " + str(endtime) + " (" + str(round(timeInterval/86400.0, 3)) + " days), both chargers are being used.")
@@ -309,21 +312,36 @@ def find_problems():
             for day in days:
                 startofday = days[i]
                 endofday = days[i+1]
-                if detect_congestion(con, startofday, endofday, meter.name):
-                    meter.problems.append(Problem(startofday, endofday, "Congestion", 0x7C007E))
-                    portUse=findUsageAverage(startofday, endofday, meter.name)
-                    i += 1
+                #if detect_congestion(con, startofday, endofday, meter.name):
+                #    meter.problems.append(Problem(startofday, endofday, "Congestion", 0x7C007E))
+
+                i += 1
+        except IndexError:
+            print("reached end of table")
+
+        try:
             i = 0
             # Checks that run for each week #
             for week in weeks:
                 startofweek = weeks[i]
                 endofweek = weeks[i + 1]
+                portUse = findUsageAverage(startofweek, endofweek, meter.name)
                 if portUse["CHADEMO"] and portUse["DCCOMBOTYP1"]:
                     meter.problems.append(Problem(startofweek, endofweek, "Charger Broken", 0xFF0000))
                 elif portUse["CHADEMO"]:
                     meter.problems.append(Problem(startofweek, endofweek, "Broken Port (CHADEMO)", 0xFF00D1))
                 elif portUse["DCCOMBOTYP1"]:
                     meter.problems.append(Problem(startofweek, endofweek, "Broken Port (DCCOMBOTYP1)", 0xF0FF00))
+                i += 1
 
         except IndexError:
             print("reached end of table")
+
+
+'''
+find_problems()
+
+for meter in meters:
+    for problem in meter.problems:
+        print(problem.problemName)
+'''
