@@ -18,77 +18,33 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
-            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
           </li>
-        </ul>
+		  </ul>
       </div>
   </nav>
   <div class="container mt-2">
     <div class="row">
       <div class="col-12">
           <div class="jumbotron">
-            <h1 class="text-center">Aloha, Welcome to&nbsp;Electric Meter Monitor <em>Extreme</em></h1>
-            <div class="row justify-content-center">
-              <div class="container mt-4">
-				  <div class="row">
-					<div class="col-sm-6">
-					  <div class="card">
-						 
-						  <canvas class="card-img-top"></canvas>
-						  
-						<div class="card-body">
-						  <h5 class="card-title">Notifications</h5>
-						  <p class="card-text">Real-time</p>
-						  <a href="#" class="btn btn-primary">Open in new window</a></div>
-					  </div>
-					</div>
-					<div class="col-sm-6">
-					  <div class="card">
-						<canvas id = "mychart" class="card-img-top"></canvas>
-						<div class="card-body">
-						  <h5 class="card-title">Power Graph</h5>
-						  <p class="card-text"> Real-time</p>
-						  <a href="/Power_User_Graph" class="btn btn-primary">Open in new window</a></div>
-					  </div>
-					</div>
-				  </div>
-			  </div>
-            </div>
+			  <center>
+				  <form method = "post">{% csrf_token %}
+					<input type = "date" name="start_time" placeholder="Start Time: MM/DD/YY" required>
+					<input type="date" name="end_time" placeholder="End Time: MM/DD/YY" required>
+					 {% for n in station %}
+					  {{ n }}: <input name = "{{ n }}" type="checkbox">
+					  {% endfor %}
+					  <button type="submit" name = "info">Submit</button>
+				  </form>
+			  </center>
           </div>
         </div>
       </div>
     </div>
-  <div class="container">
-    <hr>
-    <div class="container">
-    </div>
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-4 col-md-6 col-sm-6 mb-md-0 mb-2">
-        <h2>Contact us</h2>
-        <address>
-        <strong>Solving Hawaii's Challanges</strong><br>
-        Mililani Town, Hawaii
-        </address>
-        <address>
-        <abbr title="Phone">P:</abbr> (123) 456-7890<br>
-E-M: something@something.com
-        </address>
-      </div>
-<div class="col-lg-4 col-12"> </div>
-</div>
-</div>
-	  </div>
-    <hr>
-    <footer class="text-center">
-      <div class="container">
-        <div class="row">
-          <div class="col-12">
-            <p>EMME Special Preview Version 0.5</p>
-          </div>
-        </div>
-      </div>
-    </footer>
+	  <center>
+	<canvas id = "mychart" class="card-img-top"></canvas>
+	  </center>
+
 	  <script>
 		  let mychart = document.getElementById('mychart').getContext('2d');
 		  
@@ -98,18 +54,20 @@ E-M: something@something.com
 		  
 		  let linechart = new Chart(mychart,  {"type":"line",
 											   "data":{
-												   "labels":[{% for n in date %}
+												   "labels":[{% for n in Date %}
 															 "{{ n }}",
 															 {% endfor %}],
 												   "datasets":
-												   [{% for name in station %}
+												   [{% for name in show %}
 													   {"label":"{{ name }}",
 													 	"data":[
 														{% for n in data %}
 															{% for i in n %}
 																{% if i.Charge_Station_Name == name %}
-																	{% if i.Start_Time > mintime %}
-																		{{ i.Energy }},
+																	{% if i.Start_Time > start_time %}
+																		{% if i.Start_Time < end_time %}
+																			{{ i.Energy }},
+																		{% endif %}
 																	{% endif %}
 																{% endif %}
 															{% endfor %}

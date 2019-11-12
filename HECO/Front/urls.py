@@ -18,4 +18,6 @@ from . import views
 
 urlpatterns = [
     path('', views.Home, name = 'Home'),
+    path('Power_User_Graph/', views.power_Graph, name = 'power_Graph')
 ]
+
