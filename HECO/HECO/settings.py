@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '6sq97(_o_0g(l6f^0&w)fz-ap0qr3s@fu67lto++wejpgs8lk%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.0.45']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -81,7 +81,7 @@ DATABASES = {
         'NAME': 'hacc',
         'USER': 'hacc',
         'PASSWORD': 'hacc2019',
-        'HOST': 'mysql.sock',
+        'HOST': 'pf.parsl.dev',
         'PORT': '3306',
     }
 }
