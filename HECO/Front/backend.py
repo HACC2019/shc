@@ -134,7 +134,7 @@ def gatherRows(starttime, endtime, con):
     rowDataList = []
     for i in rowDataResults:
         rowDataList.append(i)
-    print(rowDataList)
+    #print(rowDataList)
     return rowDataList
 
 
@@ -145,7 +145,7 @@ def averageData(starttime, endtime, column):
     for i in rowDataList:
         columndata.append(rowDataList[numba][column])
         numba+=1
-    print(columndata)
+    #print(columndata)
     return columndata
 
 
@@ -156,7 +156,7 @@ def averageDataActually(starttime, endtime, column):
     for i in listOfValues:
         totalAmount+=i
         totalValues+=1
-    print(totalAmount/totalValues)
+    #print(totalAmount/totalValues)
 
 
 #Find TimeIntervals and add Timeintervals to proc table
@@ -172,9 +172,9 @@ def FindDayIntervals(db):
         x=minTime+i*UnixDayValue
         TimeIndexes.append(x)
     TimeIndexes.append(maxTime)
-    print(maxTime)
-    print(minTime)
-    print(TimeIndexes)
+    #print(maxTime)
+    #print(minTime)
+    #print(TimeIndexes)
     return(TimeIndexes)
     # add_column(db=con, table='proc', column='TimeInterval', data=FindDayIntervals())
 
@@ -238,7 +238,7 @@ def chargeCHADUsages(db, startTime, endTime, stationName):
                 pass
             else:
                 print("new charger type: {}".format(row[6]))
-    print(CHADData)
+    #print(CHADData)
     return CHADData
 
 
@@ -253,7 +253,7 @@ def chargeDCCUsages(db, startTime, endTime, stationName):
                 pass
             else:
                 print("new charger type: {}".format(row[6]))
-    print(DCCData)
+    #print(DCCData)
     return DCCData
 
 
@@ -277,8 +277,8 @@ def findUsageAverage(starttime, endtime, stationName):
         pass
         #print("From " + str(starttime) + " to " + str(endtime) + " (" + str(round(timeInterval/86400.0, 3)) + " days), both chargers are being used.")
     statusList={"CHADEMO": CHADStatus, "DCCOMBOTYP1": DCCStatus}
-    print(CHADStatus)
-    print(DCCStatus)
+    #print(CHADStatus)
+    #print(DCCStatus)
     return statusList
 
 
@@ -294,7 +294,7 @@ def FindTimeIntervals(db, timeInterval):
         x=minTime+i*UnixDayValue
         DayIndexes.append(x)
     DayIndexes.append(maxTime)
-    print(DayIndexes)
+    #print(DayIndexes)
     return DayIndexes
     # add_column(db=con, table='proc', column='TimeInterval', data=FindDayIntervals())
 
@@ -327,11 +327,11 @@ def find_problems():
                 endofweek = weeks[i + 1]
                 portUse = findUsageAverage(startofweek, endofweek, meter.name)
                 if portUse["CHADEMO"] and portUse["DCCOMBOTYP1"]:
-                    meter.problems.append(Problem(startofweek, endofweek, "Charger Broken", 0xFF0000))
+                    meter.problems.append(Problem(startofweek, endofweek, "Charger Broken", 0xFF0000, "Meter {}: Charger Broken, Start: {}, End: {}".format(meter.name, datetime.utcfromtimestamp(startofweek).strftime('%Y-%m-%d %H:%M:%S'), datetime.utcfromtimestamp(endofweek).strftime('%Y-%m-%d %H:%M:%S'))))
                 elif portUse["CHADEMO"]:
-                    meter.problems.append(Problem(startofweek, endofweek, "Broken Port (CHADEMO)", 0xFF00D1))
+                    meter.problems.append(Problem(startofweek, endofweek, "Broken Port (CHADEMO)", 0xFF00D1, "Meter {}: Broken Port (CHADEMO), Start: {}, End: {}".format(meter.name, datetime.utcfromtimestamp(startofweek).strftime('%Y-%m-%d %H:%M:%S'), datetime.utcfromtimestamp(endofweek).strftime('%Y-%m-%d %H:%M:%S'))))
                 elif portUse["DCCOMBOTYP1"]:
-                    meter.problems.append(Problem(startofweek, endofweek, "Broken Port (DCCOMBOTYP1)", 0xF0FF00))
+                    meter.problems.append(Problem(startofweek, endofweek, "Broken Port (DCCOMBOTYP1)", 0xF0FF00, "Meter {}: Broken Port (DCCOMBOTYP1), Start: {}, End: {}".format(meter.name, datetime.utcfromtimestamp(startofweek).strftime('%Y-%m-%d %H:%M:%S'), datetime.utcfromtimestamp(endofweek).strftime('%Y-%m-%d %H:%M:%S'))))
                 i += 1
 
         except IndexError:
@@ -343,5 +343,5 @@ find_problems()
 
 for meter in meters:
     for problem in meter.problems:
-        print(problem.problemName)
+        print(problem.problemDesc)
 '''
