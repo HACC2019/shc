@@ -311,19 +311,20 @@ def find_problems():
                 endofday = days[i+1]
                 if detect_congestion(con, startofday, endofday, meter.name):
                     meter.problems.append(Problem(startofday, endofday, "Congestion", 0x7C007E))
-                    portUse=findUsageAverage(startofday, endofday, meter.name)
-                    i += 1
+                i += 1
             i = 0
             # Checks that run for each week #
             for week in weeks:
                 startofweek = weeks[i]
                 endofweek = weeks[i + 1]
+                portUse = findUsageAverage(startofweek, endofweek, meter.name)
                 if portUse["CHADEMO"] and portUse["DCCOMBOTYP1"]:
                     meter.problems.append(Problem(startofweek, endofweek, "Charger Broken", 0xFF0000))
                 elif portUse["CHADEMO"]:
                     meter.problems.append(Problem(startofweek, endofweek, "Broken Port (CHADEMO)", 0xFF00D1))
                 elif portUse["DCCOMBOTYP1"]:
                     meter.problems.append(Problem(startofweek, endofweek, "Broken Port (DCCOMBOTYP1)", 0xF0FF00))
+                i += 1
 
         except IndexError:
             print("reached end of table")
