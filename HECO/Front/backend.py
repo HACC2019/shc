@@ -5,7 +5,6 @@ import MySQLdb
 from statistics import mean
 from .structures import Meter, Problem
 
-
 global meters  # List of structures.Meter objects
 meters = []
 global meterdict  # Dictionary of charger name vs 'meters' index
@@ -260,20 +259,20 @@ def findUsageAverage(starttime, endtime, stationName):
     DCCStatus=True
     timeInterval=endtime-starttime
     if (chargeCHADUsages(con, starttime, endtime, stationName) == 0) and (chargeDCCUsages(con, starttime, endtime, stationName) == 0):
-        print("From " + str(starttime) + " to " + str(endtime) + " (" + str(round(timeInterval/86400.0, 3)) + " days), both chargers appear to be broken.")
+        #print("From " + str(starttime) + " to " + str(endtime) + " (" + str(round(timeInterval/86400.0, 3)) + " days), both chargers appear to be broken.")
         CHADStatus = False
         DCCStatus = False
     elif chargeCHADUsages(con, starttime, endtime, stationName) == 0:
-        print("From " + str(starttime) + " to " + str(endtime) + " (" + str(round(timeInterval/86400.0, 3)) + " days), the CHADEMO charger appears to be broken.")
+        #print("From " + str(starttime) + " to " + str(endtime) + " (" + str(round(timeInterval/86400.0, 3)) + " days), the CHADEMO charger appears to be broken.")
         CHADStatus = False
         DCCStatus = True
     elif chargeDCCUsages(con, starttime, endtime, stationName) == 0:
-        print("From " + str(starttime) + " to " + str(endtime) + " (" + str(round(timeInterval/86400.0, 3)) + " days), the DCCOMBOTYP1 charger appears to be broken.")
+        #print("From " + str(starttime) + " to " + str(endtime) + " (" + str(round(timeInterval/86400.0, 3)) + " days), the DCCOMBOTYP1 charger appears to be broken.")
         CHADStatus = True
         DCCStatus = False
     else:
         pass
-        print("From " + str(starttime) + " to " + str(endtime) + " (" + str(round(timeInterval/86400.0, 3)) + " days), both chargers are being used.")
+        #print("From " + str(starttime) + " to " + str(endtime) + " (" + str(round(timeInterval/86400.0, 3)) + " days), both chargers are being used.")
     statusList={"CHADEMO": CHADStatus, "DCCOMBOTYP1": DCCStatus}
     print(CHADStatus)
     print(DCCStatus)
