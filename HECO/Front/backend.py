@@ -6,12 +6,13 @@ from statistics import mean
 try:
     from .structures import Meter, Problem
 except ModuleNotFoundError: # if running directly
-    from structures import Meter, Problem
+    from .structures import Meter, Problem
 
 global meters  # List of structures.Meter objects
 meters = []
 global meterdict  # Dictionary of charger name vs 'meters' index
 meterdict = {}
+predication = []
 
 con = MySQLdb.connect(db="hacc",host="pf.parsl.dev", user="hacc", passwd="hacc2019")
 cursorObj = con.cursor()
@@ -127,8 +128,8 @@ def unix_ConvertEnd(con):
 
 #given start + end time, find values between it, find avg
 #select avg kwh from raw where timestamp is less than or greater than __
-def gatherRows(starttime, endtime, con):
-    con.query(("SELECT * FROM Front_raw_data WHERE Start_Time >= '{}' AND End_Time <= '{}'".format(starttime, endtime)))
+def gatherRows(starttime, endtime, db):
+    db.query(("SELECT * FROM Front_raw_data WHERE Start_Time >= '{}' AND End_Time <= '{}'".format(starttime, endtime)))
     rowData = con.store_result()
     rowDataResults = rowData.fetch_row(maxrows=0)
     rowDataList = []
@@ -230,7 +231,6 @@ def findCongestionPercentage(db, start_time, end_time, metername):
     """Search for congestion **between** start_time and end_time
     Returns True if avg time between usages is less than CONGESTION_THRESH"""
     CONGESTION_THRESH = 60
-
     time_between_charges = []
     previous_previous_time = start_time  # When I made this variable, I realized all was lost.
     current_time = start_time
@@ -250,7 +250,7 @@ def findCongestionPercentage(db, start_time, end_time, metername):
     return congestionPercent
 
 
-def findDailyPercentage(db, starttime, metername):
+def findDailyPercentage(starttime, metername):
     daysOfTheWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
     i = 0
     percentages = []
@@ -258,14 +258,12 @@ def findDailyPercentage(db, starttime, metername):
         dayofweek = starttime+(i)*86400
         endofday = dayofweek+86400
         #findCongestionPercentage(db, dayofweek, endofday, metername)
-        percentages.append(float(findCongestionPercentage(db, dayofweek, endofday, metername)))
+        percentages.append(float(findCongestionPercentage(con, dayofweek, endofday, metername)))
         i+=1
     highestPercentage = (max(percentages))
     highestPercentageIndex = int((percentages.index(highestPercentage)))
-    congestionPrediction = ("Within this week, " + str(daysOfTheWeek[highestPercentageIndex]) + " had the highest predicted congestion at " + str(highestPercentage) + "%")
-    return congestionPrediction
-print(findDailyPercentage(con, 1536284288, "A"))
-
+    congestionPrediction = ("Within this week, " + str(daysOfTheWeek[highestPercentageIndex]) + " has the highest predicted congestion at " + str(highestPercentage) + "%")
+    predication.append(congestionPrediction)
 
 def chargeCHADUsages(db, startTime, endTime, stationName):
     rowDataList = gatherRows(startTime, endTime, db)
@@ -377,12 +375,3 @@ def find_problems():
 
         except IndexError:
             print("reached end of table")
-
-
-'''
-find_problems()
-
-for meter in meters:
-    for problem in meter.problems:
-        print(problem.problemDesc)
-'''
