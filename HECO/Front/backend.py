@@ -230,7 +230,8 @@ def detect_congestion(db, start_time, end_time, metername):
 def findCongestionPercentage(db, start_time, end_time, metername):
     """Search for congestion **between** start_time and end_time
     Returns True if avg time between usages is less than CONGESTION_THRESH"""
-    CONGESTION_THRESH = 60
+    CONGESTION_THRESH = 900
+
     time_between_charges = []
     previous_previous_time = start_time  # When I made this variable, I realized all was lost.
     current_time = start_time
@@ -262,8 +263,10 @@ def findDailyPercentage(starttime, metername):
         i+=1
     highestPercentage = (max(percentages))
     highestPercentageIndex = int((percentages.index(highestPercentage)))
-    congestionPrediction = ("Within this week, " + str(daysOfTheWeek[highestPercentageIndex]) + " has the highest predicted congestion at " + str(highestPercentage) + "%")
-    predication.append(congestionPrediction)
+    #print("Within this week, " + str(daysOfTheWeek[highestPercentageIndex]) + " had the highest predicted congestion at " + str(highestPercentage) + "%")
+
+    return highestPercentage
+
 
 def chargeCHADUsages(db, startTime, endTime, stationName):
     rowDataList = gatherRows(startTime, endTime, db)
