@@ -6,12 +6,13 @@ from statistics import mean
 try:
     from .structures import Meter, Problem
 except ModuleNotFoundError: # if running directly
-    from structures import Meter, Problem
+    from .structures import Meter, Problem
 
 global meters  # List of structures.Meter objects
 meters = []
 global meterdict  # Dictionary of charger name vs 'meters' index
 meterdict = {}
+predication = []
 
 con = MySQLdb.connect(db="hacc",host="pf.parsl.dev", user="hacc", passwd="hacc2019")
 cursorObj = con.cursor()
@@ -127,14 +128,14 @@ def unix_ConvertEnd(con):
 
 #given start + end time, find values between it, find avg
 #select avg kwh from raw where timestamp is less than or greater than __
-def gatherRows(starttime, endtime, con):
-    con.query(("SELECT * FROM Front_raw_data WHERE Start_Time >= '{}' AND End_Time <= '{}'".format(starttime, endtime)))
+def gatherRows(starttime, endtime, db):
+    db.query(("SELECT * FROM Front_raw_data WHERE Start_Time >= '{}' AND End_Time <= '{}'".format(starttime, endtime)))
     rowData = con.store_result()
     rowDataResults = rowData.fetch_row(maxrows=0)
     rowDataList = []
     for i in rowDataResults:
         rowDataList.append(i)
-    print(rowDataList)
+    #print(rowDataList)
     return rowDataList
 
 
@@ -145,7 +146,7 @@ def averageData(starttime, endtime, column):
     for i in rowDataList:
         columndata.append(rowDataList[numba][column])
         numba+=1
-    print(columndata)
+    #print(columndata)
     return columndata
 
 
@@ -156,7 +157,7 @@ def averageDataActually(starttime, endtime, column):
     for i in listOfValues:
         totalAmount+=i
         totalValues+=1
-    print(totalAmount/totalValues)
+    #print(totalAmount/totalValues)
 
 
 #Find TimeIntervals and add Timeintervals to proc table
@@ -172,9 +173,9 @@ def FindDayIntervals(db):
         x=minTime+i*UnixDayValue
         TimeIndexes.append(x)
     TimeIndexes.append(maxTime)
-    print(maxTime)
-    print(minTime)
-    print(TimeIndexes)
+    #print(maxTime)
+    #print(minTime)
+    #print(TimeIndexes)
     return(TimeIndexes)
     # add_column(db=con, table='proc', column='TimeInterval', data=FindDayIntervals())
 
@@ -250,7 +251,7 @@ def findCongestionPercentage(db, start_time, end_time, metername):
     return congestionPercent
 
 
-def findDailyPercentage(db, starttime, metername):
+def findDailyPercentage(starttime, metername):
     daysOfTheWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
     i = 0
     percentages = []
@@ -258,7 +259,7 @@ def findDailyPercentage(db, starttime, metername):
         dayofweek = starttime+(i)*86400
         endofday = dayofweek+86400
         #findCongestionPercentage(db, dayofweek, endofday, metername)
-        percentages.append(float(findCongestionPercentage(db, dayofweek, endofday, metername)))
+        percentages.append(float(findCongestionPercentage(con, dayofweek, endofday, metername)))
         i+=1
     highestPercentage = (max(percentages))
     highestPercentageIndex = int((percentages.index(highestPercentage)))
@@ -279,7 +280,7 @@ def chargeCHADUsages(db, startTime, endTime, stationName):
                 pass
             else:
                 print("new charger type: {}".format(row[6]))
-    print(CHADData)
+    #print(CHADData)
     return CHADData
 
 
@@ -294,7 +295,7 @@ def chargeDCCUsages(db, startTime, endTime, stationName):
                 pass
             else:
                 print("new charger type: {}".format(row[6]))
-    print(DCCData)
+    #print(DCCData)
     return DCCData
 
 
@@ -318,8 +319,8 @@ def findUsageAverage(starttime, endtime, stationName):
         pass
         #print("From " + str(starttime) + " to " + str(endtime) + " (" + str(round(timeInterval/86400.0, 3)) + " days), both chargers are being used.")
     statusList={"CHADEMO": CHADStatus, "DCCOMBOTYP1": DCCStatus}
-    print(CHADStatus)
-    print(DCCStatus)
+    #print(CHADStatus)
+    #print(DCCStatus)
     return statusList
 
 
@@ -335,7 +336,7 @@ def FindTimeIntervals(db, timeInterval):
         x=minTime+i*UnixDayValue
         DayIndexes.append(x)
     DayIndexes.append(maxTime)
-    print(DayIndexes)
+    #print(DayIndexes)
     return DayIndexes
     # add_column(db=con, table='proc', column='TimeInterval', data=FindDayIntervals())
 
@@ -368,21 +369,12 @@ def find_problems():
                 endofweek = weeks[i + 1]
                 portUse = findUsageAverage(startofweek, endofweek, meter.name)
                 if portUse["CHADEMO"] and portUse["DCCOMBOTYP1"]:
-                    meter.problems.append(Problem(startofweek, endofweek, "Charger Broken", 0xFF0000))
+                    meter.problems.append(Problem(startofweek, endofweek, "Charger Broken", 0xFF0000, "Meter {}: Charger Broken, Start: {}, End: {}".format(meter.name, datetime.utcfromtimestamp(startofweek).strftime('%Y-%m-%d %H:%M:%S'), datetime.utcfromtimestamp(endofweek).strftime('%Y-%m-%d %H:%M:%S'))))
                 elif portUse["CHADEMO"]:
-                    meter.problems.append(Problem(startofweek, endofweek, "Broken Port (CHADEMO)", 0xFF00D1))
+                    meter.problems.append(Problem(startofweek, endofweek, "Broken Port (CHADEMO)", 0xFF00D1, "Meter {}: Broken Port (CHADEMO), Start: {}, End: {}".format(meter.name, datetime.utcfromtimestamp(startofweek).strftime('%Y-%m-%d %H:%M:%S'), datetime.utcfromtimestamp(endofweek).strftime('%Y-%m-%d %H:%M:%S'))))
                 elif portUse["DCCOMBOTYP1"]:
-                    meter.problems.append(Problem(startofweek, endofweek, "Broken Port (DCCOMBOTYP1)", 0xF0FF00))
+                    meter.problems.append(Problem(startofweek, endofweek, "Broken Port (DCCOMBOTYP1)", 0xF0FF00, "Meter {}: Broken Port (DCCOMBOTYP1), Start: {}, End: {}".format(meter.name, datetime.utcfromtimestamp(startofweek).strftime('%Y-%m-%d %H:%M:%S'), datetime.utcfromtimestamp(endofweek).strftime('%Y-%m-%d %H:%M:%S'))))
                 i += 1
 
         except IndexError:
             print("reached end of table")
-
-
-'''
-find_problems()
-
-for meter in meters:
-    for problem in meter.problems:
-        print(problem.problemName)
-'''

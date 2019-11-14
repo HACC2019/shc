@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from .models import Raw_Data
 from datetime import datetime
+from .backend import meters, findDailyPercentage, con, predication
 
 
 # Create your views here.
@@ -8,6 +9,7 @@ def Home(request):
     name = ['i']
     datas = []
     date = []
+    errors = []
 
 
     charge_station = Raw_Data.objects.all()
@@ -37,12 +39,18 @@ def Home(request):
     mintime = int(counter) - (day * 7)
     mintime = int(mintime)
 
+    print(predication)
+
     for n in timer:
         if n.Start_Time > mintime:
             readtime = datetime.utcfromtimestamp(n.Start_Time).strftime('%Y-%m-%d %H:%M:%S')
             date.append(str(readtime))
 
-    return render(request, 'Homepage.html', {'station': name, 'data': datas, 'time': timer, 'mintime': int(mintime), 'date': date})
+    for u in meters:
+        for d in u.problems:
+            errors.append(d.problemDesc)
+
+    return render(request, 'Homepage.html', {'station': name, 'data': datas, 'time': timer, 'mintime': int(mintime), 'date': date, 'error': errors, 'prediction': predication})
 
 def power_Graph(request):
     name = ['i']

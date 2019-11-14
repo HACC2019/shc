@@ -1,0 +1,11 @@
+@charset "utf-8";
+/* CSS Document */
+#scroller{
+	height: 300px;
+	overflow-y: scroll;
+	
+}
+.card{
+	float:right;
+}
+

@@ -8,6 +8,7 @@
 	  <link rel="icon" type="image/png" href="../static/images/favicon.png">
     <!-- Bootstrap -->
     <link href="../static/css/bootstrap-4.3.1.css" rel="stylesheet">
+	  <link href="../static/css/scrollbar.css" rel="stylesheet">
 	  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
   </head>
   <body>
@@ -33,13 +34,14 @@
 				  <div class="row">
 					<div class="col-sm-6">
 					  <div class="card">
-						 
-						  <canvas class="card-img-top"></canvas>
-						  
+						 <h5 class="card-img-top">Notification</h5>
+						
 						<div class="card-body">
-						  <h5 class="card-title">Notifications</h5>
-						  <p class="card-text">Real-time</p>
-						  <a href="#" class="btn btn-primary">Open in new window</a></div>
+							<div id = "scroller">
+							  {% for i in error %}
+							  <p class="card-text">{{ i }}</p>
+							  {% endfor %}
+							</div>
 					  </div>
 					</div>
 					<div class="col-sm-6">
@@ -51,6 +53,9 @@
 						  <a href="/Power_User_Graph" class="btn btn-primary">Open in new window</a></div>
 					  </div>
 					</div>
+						{% for i in prediction %}
+							<p>{{ i }}</p>
+						{% endfor %}
 				  </div>
 			  </div>
             </div>
