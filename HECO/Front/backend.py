@@ -258,7 +258,7 @@ def findDailyPercentage(starttime, metername):
     for day in daysOfTheWeek:
         dayofweek = starttime+(i)*86400
         endofday = dayofweek+86400
-        #findCongestionPercentage(db, dayofweek, endofday, metername)
+        #findCongestionPercentage(db, dayofweek, endofday, meter name)
         percentages.append(float(findCongestionPercentage(con, dayofweek, endofday, metername)))
         i+=1
     highestPercentage = (max(percentages))
@@ -266,6 +266,12 @@ def findDailyPercentage(starttime, metername):
     statement = ("Within this week, " + str(daysOfTheWeek[highestPercentageIndex]) + " had the highest predicted congestion at " + str(highestPercentage) + "%")
     del predication[0]
     predication.append(statement)
+
+
+    #print("Within this week, " + str(daysOfTheWeek[highestPercentageIndex]) + " had the highest predicted congestion at " + str(highestPercentage) + "%")
+    dayOfWeek=starttime+86400*(highestPercentageIndex-1)
+
+    return highestPercentage
 
 
 def chargeCHADUsages(db, startTime, endTime, stationName):
@@ -325,8 +331,8 @@ def findUsageAverage(starttime, endtime, stationName):
 
 
 def FindTimeIntervals(db, timeInterval):
-    maxTime = findMaxTime(db)
-    minTime = findMinTime(db)
+    maxTime = ((1560562409,),)
+    minTime = ((1558143209,),)
     maxTime=int(maxTime[0][0])
     minTime=int(minTime[0][0])
     UnixDayValue=timeInterval
@@ -368,6 +374,7 @@ def find_problems():
                 startofweek = weeks[i]
                 endofweek = weeks[i + 1]
                 portUse = findUsageAverage(startofweek, endofweek, meter.name)
+                meter.problems = []
                 if portUse["CHADEMO"] and portUse["DCCOMBOTYP1"]:
                     meter.problems.append(Problem(startofweek, endofweek, "Charger Broken", 0xFF0000, "Meter {}: Charger Broken, Start: {}, End: {}".format(meter.name, datetime.utcfromtimestamp(startofweek).strftime('%Y-%m-%d %H:%M:%S'), datetime.utcfromtimestamp(endofweek).strftime('%Y-%m-%d %H:%M:%S'))))
                 elif portUse["CHADEMO"]:
@@ -378,3 +385,14 @@ def find_problems():
 
         except IndexError:
             print("reached end of table")
+
+'''
+find_problems()
+
+for meter in meters:
+    for problem in meter.problems:
+        print(meter.name)
+        print(problem.problemName)
+        print(problem.problemStart)
+        print(problem.problemEnd)
+'''
