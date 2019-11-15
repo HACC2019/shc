@@ -3,10 +3,10 @@ from datetime import datetime
 #unix_Converter()
 import MySQLdb
 from statistics import mean
-try:
+'''try:
     from .structures import Meter, Problem
 except ModuleNotFoundError: # if running directly
-    from .structures import Meter, Problem
+    from .structures import Meter, Problem'''
 
 global meters  # List of structures.Meter objects
 meters = []
@@ -258,15 +258,16 @@ def findDailyPercentage(starttime, metername):
     for day in daysOfTheWeek:
         dayofweek = starttime+(i)*86400
         endofday = dayofweek+86400
-        #findCongestionPercentage(db, dayofweek, endofday, metername)
+        #findCongestionPercentage(db, dayofweek, endofday, meter name)
         percentages.append(float(findCongestionPercentage(con, dayofweek, endofday, metername)))
         i+=1
     highestPercentage = (max(percentages))
     highestPercentageIndex = int((percentages.index(highestPercentage)))
     #print("Within this week, " + str(daysOfTheWeek[highestPercentageIndex]) + " had the highest predicted congestion at " + str(highestPercentage) + "%")
+    dayOfWeek=starttime+86400*(highestPercentageIndex-1)
 
     return highestPercentage
-
+findDailyPercentage(1536142577, "A")
 
 def chargeCHADUsages(db, startTime, endTime, stationName):
     rowDataList = gatherRows(startTime, endTime, db)
