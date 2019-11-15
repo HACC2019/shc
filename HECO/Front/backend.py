@@ -12,7 +12,7 @@ global meters  # List of structures.Meter objects
 meters = []
 global meterdict  # Dictionary of charger name vs 'meters' index
 meterdict = {}
-predication = []
+predication = ['i']
 
 con = MySQLdb.connect(db="hacc",host="pf.parsl.dev", user="hacc", passwd="hacc2019")
 cursorObj = con.cursor()
@@ -263,9 +263,9 @@ def findDailyPercentage(starttime, metername):
         i+=1
     highestPercentage = (max(percentages))
     highestPercentageIndex = int((percentages.index(highestPercentage)))
-    #print("Within this week, " + str(daysOfTheWeek[highestPercentageIndex]) + " had the highest predicted congestion at " + str(highestPercentage) + "%")
-
-    return highestPercentage
+    statement = ("Within this week, " + str(daysOfTheWeek[highestPercentageIndex]) + " had the highest predicted congestion at " + str(highestPercentage) + "%")
+    del predication[0]
+    predication.append(statement)
 
 
 def chargeCHADUsages(db, startTime, endTime, stationName):
