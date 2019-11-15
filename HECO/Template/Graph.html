@@ -61,19 +61,15 @@
 												   [{% for name in show %}
 													   {"label":"{{ name }}",
 													 	"data":[
-														{% for s in date %}
-															{% for n in data %}
-																{% for i in n %}
-																	{% if i.Charge_Station_Name == name %}
-																		{% if i.Start_Time > start_time %}
-																			{% if i.Start_Time < end_time %}
-																				{% if i.Start_Time == s %}
-																				{{ i.Energy }},
-																				{% endif %}
-																			{% endif %}
+														{% for n in data %}
+															{% for i in n %}
+																{% if i.Charge_Station_Name == name %}
+																	{% if i.Start_Time > start_time %}
+																		{% if i.Start_Time < end_time %}
+																			{{ i.Energy }},
 																		{% endif %}
 																	{% endif %}
-																{% endfor %}
+																{% endif %}
 															{% endfor %}
 														{% endfor %}
 												   ],
