@@ -3,10 +3,10 @@ from datetime import datetime
 #unix_Converter()
 import MySQLdb
 from statistics import mean
-'''try:
+try:
     from .structures import Meter, Problem
 except ModuleNotFoundError: # if running directly
-    from .structures import Meter, Problem'''
+    from structures import Meter, Problem
 
 global meters  # List of structures.Meter objects
 meters = []
@@ -326,8 +326,8 @@ def findUsageAverage(starttime, endtime, stationName):
 
 
 def FindTimeIntervals(db, timeInterval):
-    maxTime = findMaxTime(db)
-    minTime = findMinTime(db)
+    maxTime = ((1560562409,),)
+    minTime = ((1558143209,),)
     maxTime=int(maxTime[0][0])
     minTime=int(minTime[0][0])
     UnixDayValue=timeInterval
@@ -379,3 +379,14 @@ def find_problems():
 
         except IndexError:
             print("reached end of table")
+
+'''
+find_problems()
+
+for meter in meters:
+    for problem in meter.problems:
+        print(meter.name)
+        print(problem.problemName)
+        print(problem.problemStart)
+        print(problem.problemEnd)
+'''
