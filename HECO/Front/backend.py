@@ -6,13 +6,13 @@ from statistics import mean
 try:
     from .structures import Meter, Problem
 except ModuleNotFoundError: # if running directly
-    from .structures import Meter, Problem
+    from structures import Meter, Problem
 
 global meters  # List of structures.Meter objects
 meters = []
 global meterdict  # Dictionary of charger name vs 'meters' index
 meterdict = {}
-predication = []
+predication = ['i']
 
 con = MySQLdb.connect(db="hacc",host="pf.parsl.dev", user="hacc", passwd="hacc2019")
 cursorObj = con.cursor()
@@ -230,7 +230,8 @@ def detect_congestion(db, start_time, end_time, metername):
 def findCongestionPercentage(db, start_time, end_time, metername):
     """Search for congestion **between** start_time and end_time
     Returns True if avg time between usages is less than CONGESTION_THRESH"""
-    CONGESTION_THRESH = 60
+    CONGESTION_THRESH = 900
+
     time_between_charges = []
     previous_previous_time = start_time  # When I made this variable, I realized all was lost.
     current_time = start_time
@@ -257,13 +258,21 @@ def findDailyPercentage(starttime, metername):
     for day in daysOfTheWeek:
         dayofweek = starttime+(i)*86400
         endofday = dayofweek+86400
-        #findCongestionPercentage(db, dayofweek, endofday, metername)
+        #findCongestionPercentage(db, dayofweek, endofday, meter name)
         percentages.append(float(findCongestionPercentage(con, dayofweek, endofday, metername)))
         i+=1
     highestPercentage = (max(percentages))
     highestPercentageIndex = int((percentages.index(highestPercentage)))
-    congestionPrediction = ("Within this week, " + str(daysOfTheWeek[highestPercentageIndex]) + " has the highest predicted congestion at " + str(highestPercentage) + "%")
-    predication.append(congestionPrediction)
+    statement = ("Within this week, " + str(daysOfTheWeek[highestPercentageIndex]) + " had the highest predicted congestion at " + str(highestPercentage) + "%")
+    del predication[0]
+    predication.append(statement)
+
+
+    #print("Within this week, " + str(daysOfTheWeek[highestPercentageIndex]) + " had the highest predicted congestion at " + str(highestPercentage) + "%")
+    dayOfWeek=starttime+86400*(highestPercentageIndex-1)
+
+    return highestPercentage
+
 
 def chargeCHADUsages(db, startTime, endTime, stationName):
     rowDataList = gatherRows(startTime, endTime, db)
@@ -322,8 +331,8 @@ def findUsageAverage(starttime, endtime, stationName):
 
 
 def FindTimeIntervals(db, timeInterval):
-    maxTime = findMaxTime(db)
-    minTime = findMinTime(db)
+    maxTime = ((1560562409,),)
+    minTime = ((1558143209,),)
     maxTime=int(maxTime[0][0])
     minTime=int(minTime[0][0])
     UnixDayValue=timeInterval
@@ -365,6 +374,7 @@ def find_problems():
                 startofweek = weeks[i]
                 endofweek = weeks[i + 1]
                 portUse = findUsageAverage(startofweek, endofweek, meter.name)
+                #meter.problems = []
                 if portUse["CHADEMO"] and portUse["DCCOMBOTYP1"]:
                     meter.problems.append(Problem(startofweek, endofweek, "Charger Broken", 0xFF0000, "Meter {}: Charger Broken, Start: {}, End: {}".format(meter.name, datetime.utcfromtimestamp(startofweek).strftime('%Y-%m-%d %H:%M:%S'), datetime.utcfromtimestamp(endofweek).strftime('%Y-%m-%d %H:%M:%S'))))
                 elif portUse["CHADEMO"]:
@@ -375,3 +385,14 @@ def find_problems():
 
         except IndexError:
             print("reached end of table")
+
+'''
+find_problems()
+
+for meter in meters:
+    for problem in meter.problems:
+        print(meter.name)
+        print(problem.problemName)
+        print(problem.problemStart)
+        print(problem.problemEnd)
+'''
