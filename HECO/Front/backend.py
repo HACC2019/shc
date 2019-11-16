@@ -6,7 +6,7 @@ from statistics import mean
 try:
     from .structures import Meter, Problem
 except ModuleNotFoundError: # if running directly
-    from .structures import Meter, Problem
+    from structures import Meter, Problem
 
 global meters  # List of structures.Meter objects
 meters = []
