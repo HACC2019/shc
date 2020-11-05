@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HECO</title>
+	  <link rel="icon" type="image/png" href="../static/images/favicon.png">
+    <!-- Bootstrap -->
+    <link href="../static/css/bootstrap-4.3.1.css" rel="stylesheet">
+	  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id = "nav"><a class="navbar-brand" href="#">EMME for HECO</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+          </li>
+		  </ul>
+      </div>
+  </nav>
+  <div class="container mt-2">
+    <div class="row">
+      <div class="col-12">
+          <div class="jumbotron">
+			  <center>
+				  <form method = "post">{% csrf_token %}
+					<input type = "date" name="start_time" placeholder="Start Time: MM/DD/YY" required>
+					<input type="date" name="end_time" placeholder="End Time: MM/DD/YY" required>
+					 {% for n in station %}
+					  {{ n }}: <input name = "{{ n }}" type="checkbox">
+					  {% endfor %}
+					  <button type="submit" name = "info">Submit</button>
+				  </form>
+			  </center>
+          </div>
+        </div>
+      </div>
+    </div>
+	  <center>
+	<canvas id = "mychart" class="card-img-top"></canvas>
+	  </center>
+
+	  <script>
+		  let mychart = document.getElementById('mychart').getContext('2d');
+		  
+		  var tick = 0;
+		  var color = ["rgb(252, 3, 3)", "rgb(4, 138, 6)", "rgb(11, 224, 210)", "rgb(221, 11, 224)"]
+		  
+		  
+		  let linechart = new Chart(mychart,  {"type":"line",
+											   "data":{
+												   "labels":[{% for n in Date %}
+															 "{{ n }}",
+															 {% endfor %}],
+												   "datasets":
+												   [{% for name in show %}
+													   {"label":"{{ name }}",
+													 	"data":[
+														{% for n in data %}
+															{% for i in n %}
+																{% if i.Charge_Station_Name == name %}
+																	{% if i.Start_Time > start_time %}
+																		{% if i.Start_Time < end_time %}
+																			{{ i.Energy }},
+																		{% endif %}
+																	{% endif %}
+																{% endif %}
+															{% endfor %}
+														{% endfor %}
+												   ],
+													 "fill":false,
+													 "borderColor":color[tick++],
+												   
+													 "lineTension":0.1},
+													{% endfor %}
+												   ]},
+											   "options":{scales: {
+        													yAxes: [{
+          													scaleLabel: {
+            												display: true,
+            												labelString: 'Energy(kwH)'
+          }
+        }]
+      }}}
+		  )
+	  </script>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="../static/js/jquery-3.3.1.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="../static/js/popper.min.js"></script>
+    <script src="../static/js/bootstrap-4.3.1.js"></script>
+  </body>
+</html>
